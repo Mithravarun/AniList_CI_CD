@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Manga Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0b0b12;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1f1f2e;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    .container {
+      padding: 1rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    form {
+      background: #1a1a25;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: none;
+    }
+    button {
+      background: #5865f2;
+      color: white;
+      cursor: pointer;
+    }
+    .card {
+      background: #1a1a25;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .card h3 {
+      margin-top: 0;
+    }
+    .status {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <header>📚 My Manga / Manhwa Tracker</header>
+
+  <div class="container">
+    <form id="mangaForm">
+      <input type="hidden" id="editIndex" value="">
+      <input type="text" id="title" placeholder="Title" required>
+      <select id="type">
+        <option value="Manga">Manga</option>
+        <option value="Manhwa">Manhwa</option>
+        <option value="Manhua">Manhua</option>
+      </select>
+      <select id="status">
+        <option value="Reading">Reading</option>
+        <option value="Completed">Completed</option>
+        <option value="Plan to Read">Plan to Read</option>
+      </select>
+      <input type="number" id="rating" placeholder="Rating (1-10)" min="1" max="10">
+      <textarea id="review" placeholder="Your review"></textarea>
+      <button type="submit">Save</button>
+    </form>
+
+    <div id="list"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('mangaForm');
+    const listContainer = document.getElementById('list');
+
+    function getData() {
+      return JSON.parse(localStorage.getItem('mangaList') || '[]');
+    }
+
+    function saveData(data) {
+      localStorage.setItem('mangaList', JSON.stringify(data));
+    }
+
+    function render() {
+      const data = getData();
+      listContainer.innerHTML = '';
+      data.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <h3>${item.title}</h3>
+          <div class="status">${item.type} | ${item.status}</div>
+          <div>⭐ ${item.rating || '—'}</div>
+          <p>${item.review || ''}</p>
+          <button onclick="editItem(${i})">Edit</button>
+          <button onclick="deleteItem(${i})" style="background:#e74c3c;">Delete</button>
+        `;
+        listContainer.appendChild(div);
+      });
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      const type = typeInput.value;
+      const status = statusInput.value;
+      const rating = ratingInput.value;
+      const review = reviewInput.value;
+
+      const data = getData();
+      const editIndex = document.getElementById('editIndex').value;
+
+      if (editIndex === '') {
+        data.push({ title, type, status, rating, review });
+      } else {
+        data[editIndex] = { title, type, status, rating, review };
+      }
+
+      saveData(data);
+      form.reset();
+      document.getElementById('editIndex').value = '';
+      render();
+    });
+
+    function deleteItem(i) {
+      const data = getData();
+      data.splice(i, 1);
+      saveData(data);
+      render();
+    }
+
+    function editItem(i) {
+      const item = getData()[i];
+      document.getElementById('title').value = item.title;
+      document.getElementById('type').value = item.type;
+      document.getElementById('status').value = item.status;
+      document.getElementById('rating').value = item.rating;
+      document.getElementById('review').value = item.review;
+      document.getElementById('editIndex').value = i;
+    }
+
+    const titleInput = document.getElementById('title');
+    const typeInput = document.getElementById('type');
+    const statusInput = document.getElementById('status');
+    const ratingInput = document.getElementById('rating');
+    const reviewInput = document.getElementById('review');
+
+    render();
+  </script>
+</body>
+</html>
