@@ -36,7 +36,7 @@ pipeline {
                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URI}
                         docker pull ${ECR_URI}:${IMAGE_TAG}
                         docker rm -f anilist-container || true
-                        docker run -d --name anilist_container -p 80:80 ${ECR_URI}:${IMAGE_TAG}
+                        docker run -d --name anilist-container -p 80:80 ${ECR_URI}:${IMAGE_TAG}
                         EOF
                     '''
                     }
