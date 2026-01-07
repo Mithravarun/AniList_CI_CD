@@ -1,2 +1,2 @@
 FROM nginx:alpine
-COPY AniList.html /usr/share/nginx/html
+COPY AniList.html /usr/share/nginx/html/index.html
